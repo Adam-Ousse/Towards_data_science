@@ -78,6 +78,59 @@ df.groupby(by=["name", "family_name","adres"]).agg({'height':'max',"weight":"mea
 
 ```
 
+#### Membership constraints :
+Texts and categorical variables .
+##### categorical data.
+they are often incoded as intgeres. they can't have values that go beyond the predefined values.
+Dropping data :
+it's good practice to have a log of all possible categorical values. "categories".
+types of joins : 
+A Anti joins B => data in A that aren't present in B of a common column
+A Inner join B => data in A that are present in B of a common column
+```python
+incosistent_categories = set(df['column']).difference(categories['column'])
+incosistent_rows = df['column'].isin(incosistent_categories)
+#drop incosistent rows 
+consisent_data = df[~incosistent_rows]
+```
+Some other problems : 
+- Value inconsistency : "married", "Married", "married " :
+```python
+column = df["column"]
+column.value_counts()  #for series
+#or :
+df.groupby("column").count() #for datagrames
+
+#for a capitalization problem we can 
+df["column"] = df[column].str.lower()
+#or
+df["column"] = df[column].str.upper()
+
+#leading or trailing spaces  :
+df["column"] = df[column].str.strip()
+
+#collapsing data into categories :
+group_names = ['0-20k', '20k-40k', '40k-60k', '60k-80k', '100k+']
+ranges = [0,20000, 40000, 60000, 80000, 100000,np.inf ]
+df["new_column"] = pd.cut(df["column"], bins = ranges, labels = group_names)
+df[['column', 'new_column']].head()
+
+#mapping categories to fewer ones
+mapping ={"old_val1": "new_val1", "old_val2": "new_val2","old_val3": "new_val1", "old_value4":"new_val 1"}
+df["column"] = df["column"].replace(mapping)
+```
+- Collapsing too many categories to few : 0-20k$ , 20k-40k$,.. => rich , 0-1k : poor
+- making sure data is of type category.
+
+### Cleaning text data :
+handling inconsistency
+fixed lenghts
+typos
+replacing with regular expressions :
+```python
+phones['phone number'] = phones['phone number'].str.replace(r'\D+', '',regex=True)
+```
+
 
 
 
@@ -91,4 +144,11 @@ df["lol"].median()
 df["lol"].max()
 df["lol"].min()
 df["lol"].sort_values(by = "column_name")
+df["lol"].unique() #return the unique values
+df["column"] = df["column"].replace(mapping) #replace values with new ones uisng the mapping dictionary
+df["column"].str.replace("+", "lol") #replace the + with lol
+df.loc[df["cloimn"]<10, "column"] = np.nan #replace the values that are less than 10 with NaN
+assert df["column"].str.contains("+|-").any() == False #check if the column contains + or -
 ``
+
+

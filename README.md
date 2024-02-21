@@ -131,9 +131,53 @@ replacing with regular expressions :
 phones['phone number'] = phones['phone number'].str.replace(r'\D+', '',regex=True)
 ```
 
+#### Uniformity :
+Unit uniformity :
+temprature in C° and F° weight in KF or Lbs, money in $ or €. having different units in the same column can cause misinterpretations.
+```python
+#we can visualize out of bound data points :
+plt.scatter(df['weight'], df['height'])
+# or for temperature :
+plt.scatter(df['date'], df['temperature'])
+#to convert all temperatures :
+temp_fah = temperatures.loc[temperatures['temp']>50, 'temp']
+temp_cel = (temp_fah - 32) * 5/9
+temperatures.loc[temperatures['temp']>50, 'temp'] = temp_cel
+```
+using dates 
+```python
+birthdays['birthday'] = pd.to_datetime(birthdays['birthday'])
+# but will raise an error
+# we can use the errors parameter to handle the error and infer_datetime_format to speed up the process of identifying the formats :
+birthdays['birthday'] = pd.to_datetime(birthdays['birthday'], errors='coerce', infer_datetime_format=True)
+#NaT for dates that didnt work
+#convert the date format :
+birthdays['birthday'] =birthdays['birthday'].dt.strftime('%Y-%m-%d')
+```
+
+### Cross field validation : for diagnosing data quality issues
+use multiple fieds in a dataset to sanity check data integrity : 
+economy_class + business_class + first_class = total_seats
 
 
+```python
+sum_classes = flights[['economy_class', 'business_class', 'first_class']].sum(axis=1)
+passenger_equ = sum_classes == flights['total_passengers']
+incosistent = flights[~passenger_equ]
+consisent = flights[passenger_equ]
 
+users['birthdays'] = pd.to_datetime(users['birthdays'])
+today = dt.date.today()
+age_manual = today.year- users['birthdays'].dt.year
+age_equ = age_manual == users['age']
+inconsistents = users[~age_equ]
+consistents = users[age_equ]
+```
+or like :
+today().year - users['birthdays'].dt.year ==0
+
+What to do with inconsistent data :
+drop it, set to missing, apply rules from domain knowledge.
 ## Possible operations on a dataframe column : 
 ```python
 df["lol"].sum()

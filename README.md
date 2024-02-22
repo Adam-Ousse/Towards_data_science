@@ -178,6 +178,67 @@ today().year - users['birthdays'].dt.year ==0
 
 What to do with inconsistent data :
 drop it, set to missing, apply rules from domain knowledge.
+
+### Completeness : (missing data)
+can be represented using NA, nan, 0 , . etc..
+we can find which rows have missing data using :
+```python  
+missing = df.isna()
+missing.sum()
+import missingno as msno 
+import matplotlib.pyplot as plt
+msno.matrix(df)
+plt.show()
+missing_data = df[df['column'].isna()]
+missing_date.describe()
+#sometimes we can findout that the missing data occurs on an interval say low temperatures for a temperature measurement device :
+sorted_data = df.sort_values('temperature')
+msno.matrix(sorted_data)
+plt.show()
+```
+
+So we conclude that there are multiple types of missingness, :
+- missing completely at random : no systematic replationship between missing data and other values
+- missing at random systematic  relationship between missing data and other observed values
+- missing not at random : systematic relationship between missing data and other unobserved values.
+
+To deal with missing data :
+- drop missing data
+```python
+df = df.dropna(subset=['column'])
+```
+- impute with statistical measures(mean, median, mode..) 
+```python
+column_mean = df['column'].mean()
+df = df.fill_na(value = {'column': column_mean})
+```
+- impute using an algorithm
+- impute using machine learning models
+
+### Compare strings 
+minimum edit distance
+![img.png](Static/med.png)
+
+We're gonna compare strings using the Levenshtein Algorithm : thefuzz package
+```python
+from thefuzz import fuzz
+#compare two strings
+fuzz.WRation("Adam", "Madam") #0-100 : 100 exact match
+
+#with arrays :
+from thefuzz import process
+process.extract("Adam", ["Madam", "Adams", "Adams"], limit=2)
+```
+
+#### collapsing categories :
+"Eu", "eur", "Europ" => "europe"
+```python
+for state in categories["state"]: #correct
+    matches = process.extract(state, survey["state"], limit = survey.shape[0])
+    for potential_match in matches:
+        if potential_match[1] >= 85:
+            survey.loc[survey["state"] == potential_match[0], "state"] = state
+```
 ## Possible operations on a dataframe column : 
 ```python
 df["lol"].sum()

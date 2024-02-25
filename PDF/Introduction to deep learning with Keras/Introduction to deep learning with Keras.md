@@ -30,7 +30,7 @@ Before training a model, you need to configure the learning process, which is do
 * A loss function. This is the objective that the model will try to minimize. It can be the string identifier of an existing loss function (such as categorical_crossentropy or mse), or it can be an objective function.
 * A list of metrics. For any classification problem you will want to set this to metrics=['accuracy']. A metric could be the string identifier of an existing metric or a custom metric function.
 ```python
-model.compilte(optimizer="adam", loss="mse")
+model.compile(optimizer="adam", loss="mse")
 ```
 now it's ready to get trained 
 ### Training model :
@@ -75,3 +75,15 @@ preds = models.predict(coordinates)
 ## Multi-class classification with Keras
 ![img_2.png](img_2.png)
 ![img_3.png](img_3.png)
+
+````python
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+model.add(Dense(128, input_shape=(2,), activation="relu")) # 4 neurons, 2 input features
+model.add(Dense(64, activation="relu")) # 4 neurons, 2 input features
+model.add(Dense(32, activation="relu")) # 4 neurons, 2 input features
+
+
+model.add(Dense(4, activation="softmax")) # 1 neuron output
+model.compile(optimiozed="adam", loss="categorical_crossentropy", metrics=["accuracy"]) # metrics=["accuracy"] , binar_crossentrope is used usually with sigmoid functions
+````

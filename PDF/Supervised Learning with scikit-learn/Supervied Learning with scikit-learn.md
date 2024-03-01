@@ -16,7 +16,7 @@ predictions = model.predict(X_new)
 #### Computing accuracy :
 ![img.png](img.png)
 ```python
-from skklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=21, stratify=y)
 # it's good practice to stratify the labels so that they are distributed in train and test sets as they are in the original dataset
 ```
@@ -268,6 +268,12 @@ we usually drop missing data if it represents less than 5% of our data
 ````python
 df = df.dropna(subset["column_name","column_2"])
 ````
+or 
+````python
+threshold = 0.05 * len(df)  # 5% of the number of rows
+# Drop columns where the number of missing values is less than 5%
+df = df.dropna(thresh=threshold, axis=1)
+````
 
 imputing values :
 replacing the none values with the mean or median of the column 
@@ -301,7 +307,7 @@ Imputers are known as Transofrmers
 
 ```python
 from sklearn.pipeline import Pipeline
-
+from sklearn.impute import SimpleImputer
 steps = [("imputation", SimpleImputer()), ("scaler", StandardScaler()), ("model", LogisticRegression())]
 #every step except the last must be a transformer
 pipeline = Pipeline(steps)
@@ -309,3 +315,6 @@ pipeline = Pipeline(steps)
 pipeline.fit(X_train, y_train)
 pipeline.score(X_test, y_test)
 ```
+
+
+## Centering and Scaling

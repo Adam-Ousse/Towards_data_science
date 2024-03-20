@@ -18,8 +18,21 @@
                 "source": false
               }
             }
+          },
+          {
+            "id": "be127783b82b8c9d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              }
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -85,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "PDF/Cleaning Data in Python/Cleaning data in Python.md",
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "PDF/Cleaning Data in Python/Cleaning data in Python.md",
+                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "PDF/Cleaning Data in Python/Cleaning data in Python.md"
+                "file": "README.md"
               }
             }
           }
@@ -146,11 +159,11 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "bf3207b30ea504c2",
+  "active": "be127783b82b8c9d",
   "lastOpenFiles": [
+    "PDF/Cleaning Data in Python/Cleaning data in Python.md",
     "README.md",
     "PDF%2FCleaning Data in Python%2FCleaning data in Python.md",
-    "Dataframe.md",
-    "PDF/Cleaning Data in Python/Cleaning data in Python.md"
+    "Dataframe.md"
   ]
 }

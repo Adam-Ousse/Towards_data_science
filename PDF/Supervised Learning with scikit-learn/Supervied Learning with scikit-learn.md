@@ -18,11 +18,13 @@ predictions = model.predict(X_new)
 ```python
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=21, stratify=y)
+# stratify=y : it's good practice to stratify the labels so that they are distributed in train and test sets as they are in the original dataset
 # it's good practice to stratify the labels so that they are distributed in train and test sets as they are in the original dataset
 ```
 # Classification :
 ## k-Nearest Neighbbors :
 predict the labet of any data point by looking at the "k" closest labeled data points the data point takes the majority label of those points.
+always each column is a feauture, and each row is a new observation
 ```python
 from sklearn.neighbors import KNeighborsClassifier
 X = df[['feature1', 'feature2']].values #array each collumn is a feature and each row a new observation
@@ -41,8 +43,11 @@ new_prediction = knn.predict(X_new)
 - Accuracy : fraction of correct predictions :
 
 ````python
+from sklearn.model_selection import train_test_split X_train, X_test, y_train, y_test train_test_split(X, y, test_size=0.3, random_state=21, stratify=y)
+#stratify to make y split equal
 # like in #computing accuracy section
-print(knn.score(X_test, y_test))
+print(knn.score(X_test, y_test)) # get the accuracy
+
 ````
 ### interpretation : 
 ![img_1.png](img_1.png)
@@ -81,6 +86,7 @@ Accuracy = **(tp +tn)/(tp+tn+fp+fn)**
 Precision: positive predictive values   = **tp/(tp+fp)** : the fraction of positive predictions that are correct : 
 Recall : sensitivity = (tp)/(tp+fn) : the fraction of the truly positive instances that the classifier recognizes : high recall means low false negatives
 F1 score : 2 * (precision * recall)/(precision + recall) 
+`sklearn.metrics.confusion_matrix(_y_true_, _y_pred_, _*_, _labels=None_, _sample_weight=None_, _normalize=None_)`
 ```python
 from sklearn.metrics import classification_report, confusion_matrix
 print(confusion_matrix(y_test, y_pred))
@@ -88,6 +94,12 @@ print(classification_report(y_test, y_pred))
 ```
 ### Logistic Regression :
 calculates the probability of a data point belonging to a binary class :
+use of sigmoid function :
+Lease squares method : 
+$$W = argmin_{W}(||\sigma(XW) - Y||²)$$
+Maximum Likelihood estimation  :
+$$W = argmax_{W}(\prod_{i=1}^n P(y_i | x_i))$$
+```python)
 if p>0.5 => class 1
 else: class 0
 it produces a linear decision boundary 
@@ -103,7 +115,7 @@ y_pred_probs = logreg.predict_proba(X_test)[:,1] # the probability of the positi
 ### ROC curve : effect of changing the threshold
 ![img_4.png](img_4.png)
 ```python
-from sklearn.metric import roc_curve
+from sklearn.metrics import roc_curve
 fpr , tpr , threshold = roc_curve(y_test, y_pred_probs)
 ```
 
@@ -123,13 +135,19 @@ reg.fit(X_train, y)
 y_pred = reg.predict(X_test)
 
 ````
-(OLS  : Ordinary Least Squares regression)
+(OLS  : Ordinary Least Squares regression) minimizes :
+Risidual sum of squares : 
+$$ RSS = \sum_{i=1}^n (y_i - \hat{y_i})^2 $$
+
+where $y_i$ is the true value and $\hat{y_i}$ is the predicted value
+
+
 Linear regression works by minimizing the mean squared error between the predicted and true values. It's a measure of the model's performance. 
 the model tries to determine the coefficients :
 y = aX + b1X1 + b2X2 + ... + bnXn + c
 ### Measuring model performance :
 R-squared : 
-quantifies the vaiance in tager values explained by the featrures it ranges from 0 to 1:
+quantifies the vaiance in taget values ***explained*** by the featrures it ranges from 0 to 1:
 ![img_3.png](img_3.png)
 ````python
 reg.score(X_test, y_test)
@@ -151,6 +169,8 @@ We use cross-validation to avoid that .
     - Use k-1 folds for training and the last fold for testing
     - Repeat k times
     - Compute the average of the k results
+More robust estimate of model performance
+![](../../Pasted%20image%2020241203001148.png)
 
 ```python
 import numpy as np
@@ -159,18 +179,24 @@ from sklearn.model_selection import cross_val_score, KFold
 kf = KFold(n_splits=5, shuffle=True, random_state=1)
 reg = LinearRegression()
 cv_results = cross_val_score(reg, X, y, cv=kf)  # array of the results
+# we can use MSE as score : scoring="neg_mean_squared_error" negative cause cross_validation presumes that a higher value is better
 print(np.mean(cv_results), np.std(cv_results), np.quantile(cv_results, [0.025, 0.975]) #95%confidence interval
+#cross_val_score , by default uses the R² as the scoring metric for other metrics : by precising scoring=
 ```
 ## Regularized Regression 
 if we allow large coefficient can lead to overffiting :
-regularization : penalizing large coefficients
-- Ridge regression : L2 regularization :
-    - Loss function = OLS loss function + α * Σ(bi²)
-    - α : parameter we need to choose
+regularization : **penalizing large coefficients**
+##  **Ridge** regression : L2 regularization :
+    - Loss function = OLS loss function + α * Σ(bi²) (sum of the square of coefficients )
+    - α : parameter we need to choose (hyperparameter)
       - α = 0 : OLS
     - α = ∞ : coefficients = 0
     - α : small : overfitting
     - α : large : underfitting
+
+
+```python
+- If even for large values of alpha the model score stays relatively the same => the features explain the variance of the target variable well
 α is a hyperparameter like k in KNN and it controls model complexity
 ```python
 from sklearn.linear_model import Ridge
@@ -179,10 +205,12 @@ ridge.fit(X_train, y_train)
 ridge.score(X_test, y_test)
 ```
 
--Lasso regression :
+## **Lasso** regression :
     - Loss function = OLS loss function + α * Σ|bi|
     - Can be used to select important features of a dataset
     - Shrinks the coefficients of less important features to exactly 0
+
+
 ```python
 from sklearn.linear_model import Lasso
 lasso = Lasso(alpha = 0.1)
@@ -191,13 +219,20 @@ lasso.score(X_test, y_test)
 # performance drops when alpha >20
 ```
 Lasso can be used to determine the important features :
-features which are not shrunk to zero are selected by lasso 
+features which are not shrunk to zero are selected by lasso which tend to be important
 ```python
 lasso.coef_
-plt.bar(range(len(lasso.coef_)), lasso.coef_)
+plt.bar(df.drop(target_col,axis=1).columns, lasso.coef_)
 plt.xticks(rotation=45)
 plt.show()
 ```
+Assessing a model's performance in class imbalances : 
+we use the confusion matrix : 
+matrix : $$\begin{bmatrix} TP & FP \\ FN & TN \end{bmatrix}$$
+Accuracy : TP+ + TN / TP + TN + FP + FN
+Precision : TP / TP + FP
+Recall : TP / TP + FN
+F1 score : 2 * (precision * recall) / (precision + recall)
 
 # Hyperparamet tuning :
 like alpha in Ridge/lasso or n_neighbors in KNN 
@@ -255,8 +290,9 @@ print(dummies)
 music_df = pd.concat([music_df, dummies], axis=1) #concatenate
 music_df.drop('genre', axis=1, inplace=True)
 
-#for a single categorical feature : 
+#If the dataframe has only one categorical column :
 dummies = pd.get_dummies(music_df,drop_first=True)
+#the categorical dummy variables will have the name oldcolname_newcolname
 ```
 
 ## Missing dataset :
@@ -274,7 +310,7 @@ threshold = 0.05 * len(df)  # 5% of the number of rows
 # Drop columns where the number of missing values is less than 5%
 df = df.dropna(thresh=threshold, axis=1)
 ````
-
+`columns_to_check = music_df.columns[music_df.isna().sum() < 50]`
 imputing values :
 replacing the none values with the mean or median of the column 
 for categorical values we can replace the missing values with the most frequent value 
@@ -318,3 +354,54 @@ pipeline.score(X_test, y_test)
 
 
 ## Centering and Scaling
+The ranges in the various columns are very different, this can disproportionately influence the model.
+We want to normalize and standarize our data
+- Min-Max **Normalization** : rescaling the features to a range of , $\frac{x - min(x)}{max(x) - min(x)}$
+- Normalize in range -1 and 1  not 0 and 1 : $\frac{x - mean(x)}{max(x) - min(x)}$
+- Standardization : rescaling the features so that they have the properties of a standard normal distribution with a mean of 0 and a standard deviation of 1
+    - **z = (x - μ) / σ**
+    - **μ** is the mean of the feature values
+    - **σ** is the standard deviation of the feature values
+$$ \frac{x - μ}{σ} $$
+we scale after splitting the data to avoid data leakage which is when the test data is used to scale the training data
+```python
+from sklearn.preprocessing import StandardScaler # for standardization
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=21, stratify=y)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+```
+
+we can put it in a pipeline
+
+### Gridsearch with piepline
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
+steps = [("scaler", StandardScaler()), ("knn", KNeighborsClassifier())]
+pipeline = Pipeline(steps)
+parameters = {"knn__n_neighbors": np.arange(1, 50)} #we need to name it knn__ to specify that it's a hyperparameter of the knnmodel
+cv = GridSearchCV(pipeline, param_grid=parameters)
+cv.fit(X_train, y_train)
+
+
+```
+## Evaluating multiple models 
+![](../../Pasted%20image%2020241204195031.png)
+for regression models we can score them using : 
+- RMSE
+- R-squared 
+for classification models :
+- Accuracy
+- Precision,recall, F1 score
+- ROC AUC
+- Confusion matrix
+```python
+models = {"Logistic Regression" LogisticRegression(), "KNN": KNeighborsClassifier(),, "Decision Tree": DecisionTreeClassifier()}
+results = [] 
+for model in models.values():
+	kf = KFold(n_splits=6, random_state=42, shuffle=True) 
+	cv_results = cross_val_score (model, X_train_scaled, y_train, cv=kf) 
+	results.append(cv_results) 
+plt.boxplot(results, labels-models.keys()) 
+plt.show()

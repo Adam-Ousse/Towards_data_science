@@ -1,0 +1,41 @@
+There are ordinal (where order is important) and nominal categorical variables 
+
+- Working with categorical data in pandas 
+	- `df["col"] = df["col"].astype("category")` to transform a column dtype to category, this saves memory which we can verify using `df["col"].nbytes`
+	- `df["col"] = pd.Categorical(df["col"], categories = ["C","B","A"], ordered=True)` if it's about ordinal categorical variables 
+	- `df = pd.read_csv("data.csv", dtype={"col1":"category","col2":category"})` which specifies that those columns are categorical from the get go.
+- Modifying the propreties of a categorical series `Series.cat.method_name(new_categories=[], inplace=bool,ordered=bool,removals=[])`
+	- `df["col"].value_counts(dropna=False)` check the number of occurences of each unique value including the Nans.
+	- `df["col"].cat.set_categories(new_categories=["cat1","cat2"..] , ordered=False)` changes the categories, unlisted ones become None
+	- `df["col"].cat.add_categories(new_categories["cat1","cat2"])` adds new catgories to the series
+	- `df["col"].cat.remove_categories(removals=["cat1"])` removes a category, turning it's instances to nan
+	- `df["col"].cat.categories` returns the categories
+- Updating categories :
+	- Changing the names of categories : 
+		- `changes= {"cat1":"Cat1","cat2":"Cat3}`
+		- `df["cal"] = df["cal"].cat.rename_categories(changes)` the new names shouldnt already exist, and no 2 categories have the same new name (no collapse)
+		- `df["cal"] = df["cal"].cat.rename_categories(lambda x: x.title())` we can pass a lambda function that is applied to each category
+	- Collapsing categories
+		- `changes = {"cat1":"cat3","cat2":"cat3"}`
+		- `df["collapsed_col"] = df["col"].replace(changes)` replaces the strings with the corresponding value, we lose the category proprety
+		- `df["collapsed_col"]= df["collapsed_col"].astype("category")`
+	- Reordering categories : 
+		- `df["col"].cat.reorder_categories(new_categories=["small","medium","large"],ordered=True)` small<medium<large.
+		- `.cat.ordered` to verify whether it's ordered or not
+		- after establishing ordered categories we can filter the data with something like `df[df["cat"]>"cat1"]`
+- Cleaning categories : 
+	- collapsing categories like before with .replace()
+	- `df["col"].str.title()` , `.strip()` for whitespace .upper() , .lower() 
+- Visualizing categorical data : 
+	- `sns.catplot(kind="",x="",y="",data=)` for categorical plots like box and barplots 
+	- `sns.set(font_scale=1.25)` for bigger font
+	- `sns.catplot(kind="point",x="pool",data=df,hue="tennis",dodge=True,y="score")` dodge so that the vertical lines don't overlap
+	- countplot is the bar plot we're used to, 
+- Label encoding 0 to  n-1 encoding 
+	- with a dtype of category we can use : `df["col_codes"]=df["col"].cat.codes` 
+	- to get the code to value map `name_map= dict(zip(df["col_codes"],df["col"]))`
+	- to get the real value back : `df["col"] = df["col_codes"].map(name_map)`
+	- to create a boolean encoding : `df["is_col"] = np.where(df["col"].str.contains("lol"),1,0)` 
+- One hot encoding
+	- `pd.get_dummies(data=df, columns=["cat1","cat2"],prefix="encode")` without specifying the columns all categorical columns will turn to multiple 
+	- 
